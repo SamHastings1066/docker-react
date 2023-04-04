@@ -9,6 +9,9 @@ function App() {
         <p>
           Wagwan, big man!
         </p>
+        <p>
+          What you saying tho? Yes G
+        </p>
         <a
           className="App-link"
           href="https://reactjs.org"

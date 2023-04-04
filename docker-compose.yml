@@ -1,0 +1,22 @@
+# first specify the version of docker compose
+version: '3'
+
+# set of list of services/vontainers that are going to be created when we run
+# docker compose up
+services:
+  # you can call the app what you want, here we choose "web"
+  web:
+    # Specify the Dockerfile that we are going to use to create this container
+    build:
+      # context: tells docker compose where we want all the files and folders
+      # used ot build this image to be pulled from
+      context: .
+      # Sepcify the location of the dockerfile used to construct this service
+      # named "web"
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000" # <port outside of the container>:<port inside the container
+    volumes:
+      - /app/node_modules # this says "don't map a local folder up against node_modules in this container"
+      - .:/app # = map the cwd (.) to the app folder inside the container (/app)
+
