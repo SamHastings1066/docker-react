@@ -1,26 +1,41 @@
+# name this Workflow
 name: Deploy Frontend
+# use the 'on' keyword to define which events trigger this workflow. Here the
+# workflow is triggered by any push to the main branch
 on:
   push:
     branches:
       - main # check your repo, your default branch might be master!
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  build: # job_id of the single job tun in this workflow is "build", but you could call it anything you like
+    runs-on: ubuntu-latest # specifies the runner environment in which the job runs
+    # define the sequence of tasks contained by this "build" job
     steps:
+      # checkout out this repo: the line below uses an official GitHub Action
+      #  to checkout a repo so the workflow can access it. The action is defined
+      #  in this repo: https://github.com/actions/checkout
+      #  the @v2 means use the v2 of this repo.
       - uses: actions/checkout@v2
-      - run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+      # from the ubuntu machine in which this job runs, log into docker
+      # in order to push and pull images from dockerhub
+      - run: docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}"
+      # docker build and image with the tag after the -t flag
       - run: docker build -t cygnetops/react-test -f Dockerfile.dev .
       - run: docker run -e CI=true cygnetops/react-test npm test
 
+      # name: gives a name for this step to display on github actions
       - name: Generate deployment package
         run: zip -r deploy.zip . -x '*.git*'
 
       - name: Deploy to EB
+        # use a public action {owner}/{repo}@{ref}
         uses: einaregilsson/beanstalk-deploy@v18
+        # use "with" keyword to define the inputs required by the above
+        # action.
         with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
+          aws_access_key: "${{ secrets.AWS_ACCESS_KEY }}"
+          aws_secret_key: "${{ secrets.AWS_SECRET_KEY }}"
           application_name: docker-react
           environment_name: Dockerreact-env
           existing_bucket_name: elasticbeanstalk-us-east-2-235251022708
