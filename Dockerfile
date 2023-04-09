@@ -20,6 +20,7 @@ RUN npm run build
 
 # To specify the start of a second phase we just use the FROM command again
 FROM nginx
+EXPOSE 80
 # Copy the build folder we just created into the new nginx container we are
 # creating
 # --from=stage copy from the phase with name "stage"
